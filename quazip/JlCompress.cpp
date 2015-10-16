@@ -452,12 +452,14 @@ QStringList JlCompress::extractDir(QString fileCompressed, QString dir) {
     // Apro lo zip
     QuaZip zip(fileCompressed);
     if(!zip.open(QuaZip::mdUnzip)) {
+        qDebug()<<"JlCompress::extractDir error opening";
         return QStringList();
     }
 
     QDir directory(dir);
     QStringList extracted;
     if (!zip.goToFirstFile()) {
+        qDebug()<<"JlCompress::extractDir error goToFirstFile";
         return QStringList();
     }
     do {
@@ -465,6 +467,7 @@ QStringList JlCompress::extractDir(QString fileCompressed, QString dir) {
         QString absFilePath = directory.absoluteFilePath(name);
         if (!extractFile(&zip, "", absFilePath)) {
             removeFile(extracted);
+            qDebug()<<"JlCompress::extractDir error extracting "<<absFilePath;
             return QStringList();
         }
         extracted.append(absFilePath);
@@ -474,6 +477,7 @@ QStringList JlCompress::extractDir(QString fileCompressed, QString dir) {
     zip.close();
     if(zip.getZipError()!=0) {
         removeFile(extracted);
+        qDebug()<<"JlCompress::extractDir error closing";
         return QStringList();
     }
 
