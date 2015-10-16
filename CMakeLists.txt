@@ -32,15 +32,24 @@ else()
 endif()
 
 # Use system zlib on unix and Qt ZLIB on Windows
-IF(UNIX OR MINGW)
-	find_package(ZLIB REQUIRED)
-ELSE(UNIX)
-	SET(ZLIB_INCLUDE_DIRS "${QT_ROOT}/src/3rdparty/zlib" CACHE STRING "Path to ZLIB headers of Qt")
-	SET(ZLIB_LIBRARIES "")
-	IF(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
-		MESSAGE("Please specify a valid zlib include dir")
-	ENDIF(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
-ENDIF()
+if(UNIX OR MINGW)
+    find_package(ZLIB REQUIRED)
+else()
+    set(ZLIB_INCLUDE_DIRS "" CACHE STRING "Path to ZLIB headers")
+
+    # is Qt build with embeded zlib
+    find_path(ZLIB_INCLUDE_DIRS QtZlib/zlib.h HINTS ${Qt5Core_INCLUDE_DIRS} NO_DEFAULT_PATH)
+
+    # else try to found zlib package
+    if (NOT ZLIB_INCLUDE_DIRS)
+        find_package(ZLIB REQUIRED)
+    endif()
+      
+    if(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
+        message("Please specify a valid zlib include dir")
+    endif()
+endif()
+
 
 # All build libraries are moved to this directory
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
