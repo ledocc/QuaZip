@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 
+if(POLICY CMP0020)
+  cmake_policy(SET CMP0020 NEW)
+endif()
+
+
 project (QuaZip)
 
 option(BUILD_WITH_QT4 "Build QuaZip with Qt4 no matter if Qt5 was found" OFF)
@@ -35,30 +40,46 @@ endif()
 if(UNIX OR MINGW)
     find_package(ZLIB REQUIRED)
 else()
-    set(ZLIB_INCLUDE_DIRS "" CACHE STRING "Path to ZLIB headers")
-
     # is Qt build with embeded zlib
-    find_path(ZLIB_INCLUDE_DIRS QtZlib/zlib.h HINTS ${Qt5Core_INCLUDE_DIRS} NO_DEFAULT_PATH)
+    find_path(
+        ZLIB_INCLUDE_DIR zlib.h
+        HINTS ${Qt5Core_INCLUDE_DIRS}
+        PATH_SUFFIXES QtZlib
+        NO_DEFAULT_PATH
+    )
 
     # else try to found zlib package
-    if (NOT ZLIB_INCLUDE_DIRS)
+    if (NOT ZLIB_INCLUDE_DIR)
         find_package(ZLIB REQUIRED)
     endif()
-      
-    if(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
-        message("Please specify a valid zlib include dir")
-    endif()
+
 endif()
 
 
-# All build libraries are moved to this directory
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
-set(LIB_DESTINATION "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE STRING "Library directory name" FORCE)
-set(QUAZIP_LIB_TARGET_NAME quazip${QUAZIP_LIB_VERSION_SUFFIX} CACHE
-    INTERNAL "Target name of libquazip" FORCE)
+if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+    set(LIB_SUFFIX "64")
+endif()
+
+set(INSTALL_INCDIR include )
+set(INSTALL_BINDIR bin )
+if(WIN32)
+    set(INSTALL_LIBDIR ${INSTALL_BINDIR})
+    set(INSTALL_ARCHIVEDIR lib)
+else()
+    set(INSTALL_LIBDIR lib${LIB_POSTFIX})
+    set(INSTALL_ARCHIVEDIR lib${LIB_POSTFIX})
+endif()
+
+# All build libraries are moved to this directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_BINDIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_LIBDIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_ARCHIVEDIR})
+
+
 
 add_subdirectory(quazip)
 
-install(FILES FindQuaZip.cmake RENAME FindQuaZip${QUAZIP_LIB_VERSION_SUFFIX}.cmake DESTINATION CMakeModules)
+install(
+    FILES FindQuaZip.cmake
+    DESTINATION cmake)
