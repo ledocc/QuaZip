@@ -23,9 +23,10 @@ if (NOT WIN32)
 	set_target_properties(quazip_static PROPERTIES OUTPUT_NAME quazip)
 endif ()
 
-set_target_properties(${QUAZIP_LIB_TARGET_NAME} quazip_static PROPERTIES VERSION 1.0.0 SOVERSION 1 DEBUG_POSTFIX d)
+#set_target_properties(${QUAZIP_LIB_TARGET_NAME} quazip_static PROPERTIES VERSION 1.0.0 SOVERSION 1 DEBUG_POSTFIX d)
 # Link against ZLIB_LIBRARIES if needed (on Windows this variable is empty)
-target_link_libraries(${QUAZIP_LIB_TARGET_NAME} quazip_static ${QT_QTMAIN_LIBRARY} ${QTCORE_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(${QUAZIP_LIB_TARGET_NAME} ${QT_QTMAIN_LIBRARY} Qt5::Core ${ZLIB_LIBRARIES})
+target_link_libraries(quazip_static ${QT_QTMAIN_LIBRARY} Qt5::Core ${ZLIB_LIBRARIES})
 
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/quazip${QUAZIP_LIB_VERSION_SUFFIX})
 install(TARGETS ${QUAZIP_LIB_TARGET_NAME} quazip_static LIBRARY DESTINATION ${LIB_DESTINATION} ARCHIVE DESTINATION ${LIB_DESTINATION} RUNTIME DESTINATION ${LIB_DESTINATION})
