@@ -74,9 +74,9 @@ find_library(
     PATH_SUFFIXES lib
 )
   
-message("${QuaZip_NAME}_INCLUDE_DIR = ${${QuaZip_NAME}_INCLUDE_DIR}")
-message("${QuaZip_NAME}_LIBRARY_RELEASE = ${${QuaZip_NAME}_LIBRARY_RELEASE}")
-message("${QuaZip_NAME}_LIBRARY_DEBUG = ${${QuaZip_NAME}_LIBRARY_DEBUG}")
+#message("${QuaZip_NAME}_INCLUDE_DIR = ${${QuaZip_NAME}_INCLUDE_DIR}")
+#message("${QuaZip_NAME}_LIBRARY_RELEASE = ${${QuaZip_NAME}_LIBRARY_RELEASE}")
+#message("${QuaZip_NAME}_LIBRARY_DEBUG = ${${QuaZip_NAME}_LIBRARY_DEBUG}")
 
 if(${QuaZip_NAME}_LIBRARY_RELEASE)
     if(${QuaZip_NAME}_LIBRARY_DEBUG)
@@ -108,6 +108,14 @@ find_package_handle_standard_args(
 if(NOT ${QuaZip_NAME}_FOUND)
     return()
 endif()
+
+
+
+
+###############################################################################
+# define imported target quazip(5)(_static)
+###############################################################################
+
 add_library(${quazip_LIB_NAME} ${_QUAZIP_LIBRARY_MODE} IMPORTED)
 
 set_target_properties(
