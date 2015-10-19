@@ -105,6 +105,9 @@ find_package_handle_standard_args(
 )
 
 
+if(NOT ${QuaZip_NAME}_FOUND)
+    return()
+endif()
 add_library(${quazip_LIB_NAME} ${_QUAZIP_LIBRARY_MODE} IMPORTED)
 
 set_target_properties(
