@@ -1,8 +1,15 @@
-# QuaZip5_FOUND               - QuaZip library was found
-# QuaZip5_INCLUDE_DIRS        - Path to QuaZip and zlib include dir (combined from QUAZIP_INCLUDE_DIR + ZLIB_INCLUDE_DIR)
-# QuaZip5_LIBRARIES           - List of QuaZip libraries
+# QuaZip(5)_FOUND               - QuaZip library was found
+# QuaZip(5)_INCLUDE_DIRS        - Path to QuaZip and zlib include dir (combined from QUAZIP_INCLUDE_DIR + ZLIB_INCLUDE_DIR)
+# QuaZip(5)_LIBRARIES           - List of QuaZip libraries
 #
-# quazip5 imported library interface
+# quazip(5)(_static) imported library interface
+#
+# define this variable before call find_package(Quazip) to enable/disable feature
+#
+# QUAZIP_USE_STATIC - search/use static version of quazip
+# QUAZIP_USE_QT5    - search/use qt5 version of quazip
+
+
 
 if (QUAZIP_USE_STATIC)
     set(_QUAZIP_STATIC_SUFFIX _static)
@@ -21,11 +28,11 @@ set(QuaZip_NAME QuaZip${_QUAZIP_QT_VERSION_SUFFIX})
 set(quazip_NAME quazip${_QUAZIP_QT_VERSION_SUFFIX})
 set(quazip_LIB_NAME quazip${_QUAZIP_QT_VERSION_SUFFIX}${_QUAZIP_STATIC_SUFFIX})
 
-set(_QUAZIP_SEARCH_PATHS $ENV{${QUAZIP_UP_NAME}_DIR}
-                         $ENV{${QUAZIP_UP_NAME}_ROOT} )
+set(_QUAZIP_SEARCH_PATHS $ENV{${QUAZIP_NAME}_DIR}
+                         $ENV{${QUAZIP_NAME}_ROOT} )
 
 find_path(
-    ${QuaZip_NAME}_INCLUDE_DIR ${quazip_NAME}/quazip.h
+    ${QuaZip_NAME}_INCLUDE_DIR quazip/quazip.h
     PATHS ${_QUAZIP_SEARCH_PATHS}
     PATH_SUFFIXES include
 )
@@ -42,13 +49,21 @@ find_library(
     PATHS ${_QUAZIP_SEARCH_PATHS}
     PATH_SUFFIXES lib
 )
+  
+#message("${QuaZip_NAME}_INCLUDE_DIR = ${${QuaZip_NAME}_INCLUDE_DIR}")
+#message("${QuaZip_NAME}_LIBRARY_RELEASE = ${${QuaZip_NAME}_LIBRARY_RELEASE}")
+#message("${QuaZip_NAME}_LIBRARY_DEBUG = ${${QuaZip_NAME}_LIBRARY_DEBUG}")
 
-if(${QuaZip_NAME}_LIBRARY_RELEASE OR ${QuaZip_NAME}_LIBRARY_DEBUG)
-    set(
-        ${QuaZip_NAME}_LIBRARIES
-        release ${${QuaZip_NAME}_LIBRARY_RELEASE}
-        debug ${${QuaZip_NAME}_LIBRARY_DEBUG}
-    )
+if(${QuaZip_NAME}_LIBRARY_RELEASE)
+    if(${QuaZip_NAME}_LIBRARY_DEBUG)
+        set(
+	    ${QuaZip_NAME}_LIBRARIES
+            optimize ${${QuaZip_NAME}_LIBRARY_RELEASE}
+            debug ${${QuaZip_NAME}_LIBRARY_DEBUG}
+        )
+    else()
+        set(${QuaZip_NAME}_LIBRARIES ${${QuaZip_NAME}_LIBRARY_RELEASE})
+    endif()
 endif()
 
 if(${QuaZip_NAME}_INCLUDE_DIR)
@@ -68,6 +83,20 @@ find_package_handle_standard_args(
 
 add_library(${quazip_LIB_NAME} ${_QUAZIP_LIBRARY_MODE} IMPORTED)
 
-set_property(${quazip_LIB_NAME} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${${QuaZip_NAME}_INCLUDE_DIRS})
-set_property(${quazip_LIB_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES_RELEASE ${${QuaZip_NAME}_LIBRARY_RELEASE})
-set_property(${quazip_LIB_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES_DEBUG ${${QuaZip_NAME}_LIBRARY_DEBUG})
+set_target_properties(
+    ${quazip_LIB_NAME}
+    PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${${QuaZip_NAME}_INCLUDE_DIRS}
+        INTERFACE_LINK_LIBRARIES_RELEASE ${${QuaZip_NAME}_LIBRARY_RELEASE}
+)
+
+
+if (${${QuaZip_NAME}_LIBRARY_DEBUG})
+  
+    set_target_properties(
+        ${quazip_LIB_NAME}
+        PROPERTIES
+             INTERFACE_LINK_LIBRARIES_DEBUG ${${QuaZip_NAME}_LIBRARY_DEBUG}
+    )
+
+endif()
