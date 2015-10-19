@@ -11,6 +11,10 @@
 
 
 
+# TODO include Qt header/lib in quazip imported target
+
+
+
 if (QUAZIP_USE_STATIC)
     set(_QUAZIP_STATIC_SUFFIX _static)
     set(_QUAZIP_LIBRARY_MODE STATIC)
@@ -50,9 +54,9 @@ find_library(
     PATH_SUFFIXES lib
 )
   
-#message("${QuaZip_NAME}_INCLUDE_DIR = ${${QuaZip_NAME}_INCLUDE_DIR}")
-#message("${QuaZip_NAME}_LIBRARY_RELEASE = ${${QuaZip_NAME}_LIBRARY_RELEASE}")
-#message("${QuaZip_NAME}_LIBRARY_DEBUG = ${${QuaZip_NAME}_LIBRARY_DEBUG}")
+message("${QuaZip_NAME}_INCLUDE_DIR = ${${QuaZip_NAME}_INCLUDE_DIR}")
+message("${QuaZip_NAME}_LIBRARY_RELEASE = ${${QuaZip_NAME}_LIBRARY_RELEASE}")
+message("${QuaZip_NAME}_LIBRARY_DEBUG = ${${QuaZip_NAME}_LIBRARY_DEBUG}")
 
 if(${QuaZip_NAME}_LIBRARY_RELEASE)
     if(${QuaZip_NAME}_LIBRARY_DEBUG)
@@ -88,6 +92,7 @@ set_target_properties(
     PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES ${${QuaZip_NAME}_INCLUDE_DIRS}
         INTERFACE_LINK_LIBRARIES_RELEASE ${${QuaZip_NAME}_LIBRARY_RELEASE}
+        IMPORTED_LOCATION_RELEASE        ${${QuaZip_NAME}_LIBRARY_RELEASE}
 )
 
 
@@ -97,6 +102,7 @@ if (${${QuaZip_NAME}_LIBRARY_DEBUG})
         ${quazip_LIB_NAME}
         PROPERTIES
              INTERFACE_LINK_LIBRARIES_DEBUG ${${QuaZip_NAME}_LIBRARY_DEBUG}
+             IMPORTED_LOCATION_DEBUG        ${${QuaZip_NAME}_LIBRARY_DEBUG}
     )
 
 endif()
