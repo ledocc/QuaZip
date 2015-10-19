@@ -44,7 +44,7 @@ target_link_libraries(${QUAZIP_LIB_TARGET_NAME}_static Qt5::Core ${ZLIB_LIBRARIE
 
 install(
     FILES ${PUBLIC_HEADERS}
-    DESTINATION include/quazip${QUAZIP_LIB_VERSION_SUFFIX}
+    DESTINATION include/quazip
 )
 install(
     TARGETS ${QUAZIP_LIB_TARGET_NAME} ${QUAZIP_LIB_TARGET_NAME}_static
