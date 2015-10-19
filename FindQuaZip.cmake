@@ -122,14 +122,21 @@ set_target_properties(
     ${quazip_LIB_NAME}
     PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES ${${QuaZip_NAME}_INCLUDE_DIRS}
-        INTERFACE_LINK_LIBRARIES_RELEASE ${${QuaZip_NAME}_LIBRARY_RELEASE}
-        IMPORTED_LOCATION_RELEASE        ${${QuaZip_NAME}_LIBRARY_RELEASE}
+        IMPORTED_LOCATION_RELEASE     ${${QuaZip_NAME}_LIBRARY_RELEASE}
 )
 set_property(
     TARGET ${quazip_LIB_NAME}
     APPEND PROPERTY
         INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIR}
 )
+
+if(ZLIB_LIBRARIES)
+    set_property(
+        TARGET ${quazip_LIB_NAME}
+        APPEND PROPERTY
+            INTERFACE_LINK_LIBRARIES ${ZLIB_LIBRARIES}
+    )
+endif()
 
 if(QUAZIP_USE_STATIC)
     set_property(
@@ -144,7 +151,6 @@ if (${${QuaZip_NAME}_LIBRARY_DEBUG})
     set_target_properties(
         ${quazip_LIB_NAME}
         PROPERTIES
-             INTERFACE_LINK_LIBRARIES_DEBUG ${${QuaZip_NAME}_LIBRARY_DEBUG}
              IMPORTED_LOCATION_DEBUG        ${${QuaZip_NAME}_LIBRARY_DEBUG}
     )
 
