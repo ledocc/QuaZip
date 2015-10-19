@@ -120,6 +120,13 @@ set_property(
         INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIR}
 )
 
+if(QUAZIP_USE_STATIC)
+    set_property(
+        TARGET ${quazip_LIB_NAME}
+        APPEND PROPERTY
+            INTERFACE_COMPILE_DEFINITIONS QUAZIP_STATIC
+    )
+endif()
 
 if (${${QuaZip_NAME}_LIBRARY_DEBUG})
   
