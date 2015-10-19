@@ -27,9 +27,9 @@ add_library(${QUAZIP_LIB_TARGET_NAME}_static STATIC ${SRCS})
  
 # Windows uses .lib extension for both static and shared library
 # *nix systems use different extensions for SHARED and STATIC library and by convention both libraries have the same name
-if (NOT WIN32)
-        set_target_properties(${QUAZIP_LIB_TARGET_NAME}_static PROPERTIES OUTPUT_NAME ${QUAZIP_LIB_TARGET_NAME})
-endif ()
+#if (NOT WIN32)
+#        set_target_properties(${QUAZIP_LIB_TARGET_NAME}_static PROPERTIES OUTPUT_NAME ${QUAZIP_LIB_TARGET_NAME})
+#endif ()
 
 #set_target_properties(${QUAZIP_LIB_TARGET_NAME} quazip_static PROPERTIES VERSION 1.0.0 SOVERSION 1 DEBUG_POSTFIX d)
 # Link against ZLIB_LIBRARIES if needed (on Windows this variable is empty)
