@@ -14,6 +14,26 @@
 # TODO include Qt header/lib in quazip imported target
 
 
+if(UNIX OR MINGW)
+    find_package(ZLIB REQUIRED)
+else()
+    # is Qt build with embeded zlib
+    find_path(
+        ZLIB_INCLUDE_DIR zlib.h
+        HINTS ${Qt5Core_INCLUDE_DIRS}
+        PATH_SUFFIXES QtZlib
+        NO_DEFAULT_PATH
+    )
+
+    # else try to found zlib package
+    if (NOT ZLIB_INCLUDE_DIR)
+        find_package(ZLIB REQUIRED)
+    endif()
+
+endif()
+
+
+
 
 if (QUAZIP_USE_STATIC)
     set(_QUAZIP_STATIC_SUFFIX _static)
@@ -93,6 +113,11 @@ set_target_properties(
         INTERFACE_INCLUDE_DIRECTORIES ${${QuaZip_NAME}_INCLUDE_DIRS}
         INTERFACE_LINK_LIBRARIES_RELEASE ${${QuaZip_NAME}_LIBRARY_RELEASE}
         IMPORTED_LOCATION_RELEASE        ${${QuaZip_NAME}_LIBRARY_RELEASE}
+)
+set_property(
+    TARGET ${quazip_LIB_NAME}
+    APPEND PROPERTY
+        INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIR}
 )
 
 
