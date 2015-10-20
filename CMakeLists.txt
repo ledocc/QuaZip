@@ -82,4 +82,4 @@ add_subdirectory(quazip)
 
 install(
     FILES FindQuaZip.cmake
-    DESTINATION cmake)
+    DESTINATION lib/cmake/QuaZip)
