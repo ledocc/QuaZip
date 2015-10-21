@@ -81,5 +81,5 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_ARCHIVEDIR})
 add_subdirectory(quazip)
 
 install(
-    FILES FindQuaZip.cmake
+    FILES QuaZipConfig.cmake
     DESTINATION lib/cmake/QuaZip)
