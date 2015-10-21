@@ -150,7 +150,7 @@ set_property(
 #    ${ZLIB_LIBRARIES}
 #    Qt5::Core
 #)
-message("ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
+
 set_property(
     TARGET ${quazip_LIB_NAME}
     PROPERTY INTERFACE_LINK_LIBRARIES 
