@@ -22,8 +22,21 @@ set(SRCS ${SRCS} ${MOC_SRCS})
 # build commands
 ###########################################################
 
-add_library(${QUAZIP_LIB_TARGET_NAME} SHARED ${SRCS})
-add_library(${QUAZIP_LIB_TARGET_NAME}_static STATIC ${SRCS})
+add_library(quazip_obj OBJECT ${SRCS})
+
+# not yet available
+#target_link_libraries(quazip_obj Qt5::Core ${ZLIB_LIBRARIES})
+
+# so use complicate way
+target_include_directories(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_INCLUDE_DIRECTORIES>)
+target_compile_definitions(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_DEFINITIONS>)
+target_compile_options(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_OPTIONS>)
+get_target_property(Qt5Core_PIC Qt5::Core INTERFACE_POSITION_INDEPENDENT_CODE)
+set_target_properties(quazip_obj PROPERTIES POSITION_INDEPENDENT_CODE ${Qt5Core_PIC})
+
+
+add_library(${QUAZIP_LIB_TARGET_NAME} SHARED $<TARGET_OBJECTS:quazip_obj>)
+add_library(${QUAZIP_LIB_TARGET_NAME}_static STATIC $<TARGET_OBJECTS:quazip_obj>)
  
 # Windows uses .lib extension for both static and shared library
 # *nix systems use different extensions for SHARED and STATIC library and by convention both libraries have the same name
