@@ -54,14 +54,14 @@ if(UNIX OR MINGW)
 else()
     # is Qt build with embeded zlib
     find_path(
-        ZLIB_INCLUDE_DIR zlib.h
+        ZLIB_INCLUDE_DIRS zlib.h
         HINTS ${Qt5Core_INCLUDE_DIRS}
         PATH_SUFFIXES QtZlib
         NO_DEFAULT_PATH
     )
 
     # else try to found zlib package
-    if (NOT ZLIB_INCLUDE_DIR)
+    if (NOT ZLIB_INCLUDE_DIRS)
         find_package(ZLIB REQUIRED)
     endif()
 
