@@ -1,11 +1,6 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0.2)
 
-if(POLICY CMP0020)
-  cmake_policy(SET CMP0020 NEW)
-endif()
-
-
-project (QuaZip)
+project (QuaZip VERSION 0.7.1)
 
 option(BUILD_WITH_QT4 "Build QuaZip with Qt4 no matter if Qt5 was found" OFF)
 
@@ -81,5 +76,5 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_ARCHIVEDIR})
 add_subdirectory(quazip)
 
 install(
-    FILES QuaZipConfig.cmake
+    FILES QuaZipConfig.cmake QuaZipConfigVersion.cmake
     DESTINATION lib/cmake/QuaZip)
