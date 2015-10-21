@@ -128,7 +128,26 @@ endif()
 # define imported target quazip(5)(_static)
 ###############################################################################
 
+# interface library
 add_library(${quazip_LIB_NAME} ${_QUAZIP_LINK_MODE} IMPORTED)
+
+# library location
+set_property(
+    TARGET ${quazip_LIB_NAME}
+    PROPERTY IMPORTED_LOCATION_RELEASE
+             ${${QuaZip_NAME}_LIBRARY_RELEASE}
+)
+
+if(EXISTS ${${QuaZip_NAME}_LIBRARY_DEBUG})    
+    set_property(
+        TARGET ${quazip_LIB_NAME}
+        PROPERTY IMPORTED_LOCATION_DEBUG
+                 ${${QuaZip_NAME}_LIBRARY_DEBUG}
+    )
+endif()
+
+
+# library dependencies
 
 #target_include_directories(
 #  ${quazip_LIB_NAME}
@@ -139,14 +158,13 @@ add_library(${quazip_LIB_NAME} ${_QUAZIP_LINK_MODE} IMPORTED)
 set_property(
     TARGET ${quazip_LIB_NAME}
     PROPERTY INTERFACE_INCLUDE_DIRECTORIES 
-    ${${QuaZip_NAME}_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
-    )
+             ${${QuaZip_NAME}_INCLUDE_DIRS}
+             ${ZLIB_INCLUDE_DIRS}
+)
 
 #target_link_libraries(
 #  ${quazip_LIB_NAME}
 #  INTERFACE
-#    ${${QuaZip_NAME}_LIBRARIES}
 #    ${ZLIB_LIBRARIES}
 #    Qt5::Core
 #)
@@ -154,35 +172,16 @@ set_property(
 set_property(
     TARGET ${quazip_LIB_NAME}
     PROPERTY INTERFACE_LINK_LIBRARIES 
-    ${ZLIB_LIBRARIES}
-    Qt5::Core
-    )
-set_property(
-    TARGET ${quazip_LIB_NAME}
-    PROPERTY IMPORTED_LOCATION_RELEASE
-    ${${QuaZip_NAME}_LIBRARY_RELEASE}
+             ${ZLIB_LIBRARIES}
+             Qt5::Core
 )
 
-if(EXISTS ${${QuaZip_NAME}_LIBRARY_DEBUG})    
+if(QUAZIP_USE_STATIC)
+#    target_compile_definitions(${quazip_LIB_NAME} INTERFACE QUAZIP_STATIC)
     set_property(
         TARGET ${quazip_LIB_NAME}
-        PROPERTY IMPORTED_LOCATION_DEBUG
-        ${${QuaZip_NAME}_LIBRARY_DEBUG}
+        PROPERTY INTERFACE_COMPILE_DEFINITIONS
+                 QUAZIP_STATIC
     )
-endif()
-
-if(QUAZIP_USE_STATIC)
-#    target_compile_definitions(
-#        ${quazip_LIB_NAME}
-#        INTERFACE
-#            QUAZIP_STATIC
-#    )
-
-set_property(
-    TARGET ${quazip_LIB_NAME}
-    PROPERTY INTERFACE_COMPILE_DEFINITIONS
-    QUAZIP_STATIC
-    )
-
 
 endif()
