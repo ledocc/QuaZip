@@ -73,6 +73,9 @@ endif()
 # define quazip(5) include / libs path
 ###############################################################################
 
+get_filename_component(_quazip_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+include(${_quazip_install_prefix}/lib/cmake/target_properties.cmake)
+
 #######################
 # define usefull name
 #
@@ -82,20 +85,27 @@ set(quazip_NAME quazip${_QUAZIP_QT_VERSION_SUFFIX})
 set(quazip_LIB_NAME quazip${_QUAZIP_QT_VERSION_SUFFIX}${_QUAZIP_STATIC_SUFFIX})
 
 
-get_filename_component(_quazip_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
-
-
-
-set(QUAZIP_RELEASE_LIB_FILE ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_PREFIX}${quazip_LIB_NAME}${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_SUFFIX})
-set(QUAZIP_DEBUG_LIB_FILE ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_PREFIX}${quazip_LIB_NAME}_d${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_SUFFIX})
 
 
 set(${QuaZip_NAME}_INCLUDE_DIRS    ${_quazip_install_prefix}/include)
-set(${QuaZip_NAME}_LIBRARY_RELEASE ${_quazip_install_prefix}/lib/${QUAZIP_RELEASE_LIB_FILE})
-set(${QuaZip_NAME}_LIBRARY_DEBUG   ${_quazip_install_prefix}/lib/${QUAZIP_DEBUG_LIB_FILE})
+
+function(define_quazip_lib_file BUILD_TYPE)
+    set(_quazip_PREFIX ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_PREFIX})
+    set(_quazip_POSTFIX ${CMAKE_${${BUILD_TYPE}}_POSTFIX})
+    set(_quazip_SUFFIX ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_SUFFIX})
+
+    set(QUAZIP_${BUILD_MODE}_LIB_FILE ${_quazip_PREFIX}${quazip_LIB_NAME}${_quazip_POSTFIX}${_quazip_SUFFIX})
+
+    set(${QuaZip_NAME}_LIBRARY_${BUILD_TYPE} ${_quazip_install_prefix}/lib/${QUAZIP_${BUILD_TYPE}_LIB_FILE})
+endfunction()
+
+define_quazip_lib_file(RELEASE)
+define_quazip_lib_file(DEBUG)
+define_quazip_lib_file(RELWITHDEBINFO)
 
 
-if(${QuaZip_NAME}_LIBRARY_DEBUG)
+# old way ...
+if(EXISTS ${QuaZip_NAME}_LIBRARY_DEBUG)
     set(
 	${QuaZip_NAME}_LIBRARIES
         optimize ${${QuaZip_NAME}_LIBRARY_RELEASE}
@@ -131,20 +141,25 @@ endif()
 # interface library
 add_library(${quazip_LIB_NAME} ${_QUAZIP_LINK_MODE} IMPORTED)
 
-# library location
-set_property(
-    TARGET ${quazip_LIB_NAME}
-    PROPERTY IMPORTED_LOCATION_RELEASE
-             ${${QuaZip_NAME}_LIBRARY_RELEASE}
-)
 
-if(EXISTS ${${QuaZip_NAME}_LIBRARY_DEBUG})    
+function(define_quazip_location BUILD_TYPE)
+
+    if (NOT EXISTS ${${QuaZip_NAME}_LIBRARY_${BUILD_TYPE})
+        return()
+    endif()
+
     set_property(
         TARGET ${quazip_LIB_NAME}
-        PROPERTY IMPORTED_LOCATION_DEBUG
-                 ${${QuaZip_NAME}_LIBRARY_DEBUG}
+        PROPERTY IMPORTED_LOCATION_${BUILD_TYPE}
+                 ${${QuaZip_NAME}_LIBRARY_${BUILD_TYPE}}
     )
-endif()
+
+endfunction()
+
+# library location
+define_quazip_location(RELEASE)
+define_quazip_location(DEBUG)
+define_quazip_location(RELWITHDEBINFO)
 
 
 # library dependencies

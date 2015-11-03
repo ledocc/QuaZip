@@ -1,0 +1,4 @@
+
+
+set(CMAKE_DEBUG_POSTFIX "_debug")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "_relWithDebInfo")

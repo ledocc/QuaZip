@@ -71,7 +71,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_BINDIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_LIBDIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${INSTALL_ARCHIVEDIR})
 
-set(CMAKE_DEBUG_POSTFIX "_d")
+
+include(cmake/target_properties.cmake)
+
 
 if(CMAKE_HOST_APPLE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
@@ -82,3 +84,7 @@ add_subdirectory(quazip)
 install(
     FILES QuaZipConfig.cmake QuaZipConfigVersion.cmake
     DESTINATION lib/cmake/QuaZip)
+
+install(
+    FILES cmake/target_properties.cmake
+    DESTINATION lib/cmake)
