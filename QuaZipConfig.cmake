@@ -94,9 +94,11 @@ function(define_quazip_lib_file BUILD_TYPE)
     set(_quazip_POSTFIX ${CMAKE_${${BUILD_TYPE}}_POSTFIX})
     set(_quazip_SUFFIX ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_SUFFIX})
 
-    set(QUAZIP_${BUILD_MODE}_LIB_FILE ${_quazip_PREFIX}${quazip_LIB_NAME}${_quazip_POSTFIX}${_quazip_SUFFIX})
+    set(_quazip_LIB_FILE ${_quazip_PREFIX}${quazip_LIB_NAME}${_quazip_POSTFIX}${_quazip_SUFFIX})
 
-    set(${QuaZip_NAME}_LIBRARY_${BUILD_TYPE} ${_quazip_install_prefix}/lib/${QUAZIP_${BUILD_TYPE}_LIB_FILE})
+    set(QUAZIP_${BUILD_MODE}_LIB_FILE ${_quazip_LIB_FILE} PARENT_SCOPE)
+
+    set(${QuaZip_NAME}_LIBRARY_${BUILD_TYPE} ${_quazip_install_prefix}/lib/${_quazip_LIB_FILE} PARENT_SCOPE)
 endfunction()
 
 define_quazip_lib_file(RELEASE)
@@ -144,7 +146,7 @@ add_library(${quazip_LIB_NAME} ${_QUAZIP_LINK_MODE} IMPORTED)
 
 function(define_quazip_location BUILD_TYPE)
 
-    if (NOT EXISTS ${${QuaZip_NAME}_LIBRARY_${BUILD_TYPE})
+    if (NOT EXISTS ${${QuaZip_NAME}_LIBRARY_${BUILD_TYPE}})
         return()
     endif()
 
