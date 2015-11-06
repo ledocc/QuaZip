@@ -91,7 +91,7 @@ set(${QuaZip_NAME}_INCLUDE_DIRS    ${_quazip_install_prefix}/include)
 
 function(define_quazip_lib_file BUILD_TYPE)
     set(_quazip_PREFIX ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_PREFIX})
-    set(_quazip_POSTFIX ${CMAKE_${${BUILD_TYPE}}_POSTFIX})
+    set(_quazip_POSTFIX ${QUAZIP_${${BUILD_TYPE}}_POSTFIX})
     set(_quazip_SUFFIX ${CMAKE_${_QUAZIP_LINK_MODE}_LIBRARY_SUFFIX})
 
     set(_quazip_LIB_FILE ${_quazip_PREFIX}${quazip_LIB_NAME}${_quazip_POSTFIX}${_quazip_SUFFIX})
