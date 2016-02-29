@@ -1,5 +1,5 @@
 
-set(QUAZIP_LIB_TARGET_NAME quazip${QUAZIP_LIB_VERSION_SUFFIX})
+set(target quazip${QuaZip_LIB_VERSION_SUFFIX})
 
 # Must be added to enable export macro
 add_definitions(-DQUAZIP_BUILD)
@@ -10,11 +10,11 @@ include_directories(
         ${ZLIB_INCLUDE_DIR}
 )
 
-file(GLOB SRCS "*.c" "*.cpp")
-file(GLOB PUBLIC_HEADERS "*.h")
+file(GLOB QUAZIP_SRCS "*.c" "*.cpp")
+file(GLOB QUAZIP_PUBLIC_HEADERS "*.h")
 
-qt_wrap_cpp(MOC_SRCS ${PUBLIC_HEADERS})
-set(SRCS ${SRCS} ${MOC_SRCS})
+qt_wrap_cpp(QUAZIP_MOC_SRCS ${QUAZIP_PUBLIC_HEADERS})
+set(SRCS ${QUAZIP_SRCS} ${QUAZIP_MOC_SRCS})
 
 
 
@@ -22,33 +22,28 @@ set(SRCS ${SRCS} ${MOC_SRCS})
 # build commands
 ###########################################################
 
-add_library(quazip_obj OBJECT ${SRCS})
+add_library(${target} ${QUAZIP_SRCS})
 
-# not yet available
-#target_link_libraries(quazip_obj Qt5::Core ${ZLIB_LIBRARIES})
+set_target_properties(
+    ${target}
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE 1 # force to use fPIC even in static mode
+)
 
-# so use complicate way
-target_include_directories(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_INCLUDE_DIRECTORIES>)
-target_compile_definitions(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_DEFINITIONS>)
-target_compile_options(quazip_obj PRIVATE $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_OPTIONS>)
-get_target_property(Qt5Core_PIC Qt5::Core INTERFACE_POSITION_INDEPENDENT_CODE)
-set_target_properties(quazip_obj PROPERTIES POSITION_INDEPENDENT_CODE ${Qt5Core_PIC})
+target_link_libraries(
+    ${target}
+    Qt5::Core
+    ${ZLIB_LIBRARIES}
+)
 
-
-add_library(${QUAZIP_LIB_TARGET_NAME} SHARED $<TARGET_OBJECTS:quazip_obj>)
-add_library(${QUAZIP_LIB_TARGET_NAME}_static STATIC $<TARGET_OBJECTS:quazip_obj>)
- 
-# Windows uses .lib extension for both static and shared library
-# *nix systems use different extensions for SHARED and STATIC library and by convention both libraries have the same name
-#if (NOT WIN32)
-#        set_target_properties(${QUAZIP_LIB_TARGET_NAME}_static PROPERTIES OUTPUT_NAME ${QUAZIP_LIB_TARGET_NAME})
-#endif ()
-
-#set_target_properties(${QUAZIP_LIB_TARGET_NAME} quazip_static PROPERTIES VERSION 1.0.0 SOVERSION 1 DEBUG_POSTFIX d)
-# Link against ZLIB_LIBRARIES if needed (on Windows this variable is empty)
-target_link_libraries(${QUAZIP_LIB_TARGET_NAME} Qt5::Core ${ZLIB_LIBRARIES})
-target_link_libraries(${QUAZIP_LIB_TARGET_NAME}_static Qt5::Core ${ZLIB_LIBRARIES})
-
+set_target_properties(${taret} PROPERTIES
+  FRAMEWORK TRUE
+  FRAMEWORK_VERSION CXX
+  MACOSX_FRAMEWORK_IDENTIFIER org.quazip.QuaZip
+  MACOSX_FRAMEWORK_INFO_PLIST Info.plist
+  PUBLIC_HEADER dynamicFramework.h
+  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+)
 
 
 ###########################################################
@@ -56,12 +51,33 @@ target_link_libraries(${QUAZIP_LIB_TARGET_NAME}_static Qt5::Core ${ZLIB_LIBRARIE
 ###########################################################
 
 install(
-    FILES ${PUBLIC_HEADERS}
-    DESTINATION include/quazip
+    FILES ${QUAZIP_PUBLIC_HEADERS}
+    DESTINATION
+        include/quazip
+    COMPONENT
+        Devel
 )
+
 install(
-    TARGETS ${QUAZIP_LIB_TARGET_NAME} ${QUAZIP_LIB_TARGET_NAME}_static
-    RUNTIME DESTINATION ${INSTALL_BINDIR}
-    LIBRARY DESTINATION ${INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${INSTALL_ARCHIVEDIR}
+    TARGETS ${target}
+    EXPORT ${target}Targets
+    ARCHIVE  DESTINATION ${INSTALL_ARCHIVE_DIR}
+    LIBRARY  DESTINATION ${INSTALL_LIBRARY_DIR}
+    RUNTIME  DESTINATION ${INSTALL_RUNTIME_DIR}
+    INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
 )
+
+export(
+    EXPORT
+        ${target}Targets
+    FILE
+        "${CMAKE_CURRENT_BINARY_DIR}/${target}Targets.cmake" # TODO test remove this
+)
+
+install(
+    EXPORT
+        ${target}Targets
+    DESTINATION
+        ${ConfigPackageLocation}
+)
+

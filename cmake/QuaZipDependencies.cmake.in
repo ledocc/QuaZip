@@ -1,0 +1,7 @@
+include(CMakeFindDependencyMacro)
+
+set(QuaZip_LIB_VERSION_SUFFIX ${QuaZip_LIB_VERSION_SUFFIX})
+
+if (${QuaZip_SEARCH_ZLIB})
+    find_dependency(ZLIB)
+endif()
