@@ -33,10 +33,6 @@ if(QuaZip_BUILD_WITH_QT4)
     include_directories(${QT_INCLUDES})
     set(QTCORE_LIBRARIES ${QT_QTCORE_LIBRARY})
 
-    macro(qt_wrap_cpp)
-        qt4_wrap_cpp(${ARGN})
-    endmacro()
-
 else()
     find_package(
         Qt5 REQUIRED
@@ -50,10 +46,6 @@ else()
     if ("${QT_ROOT}" STREQUAL "")
         set(QT_ROOT ${QT_QTCORE_INCLUDE_DIR}/../..)
     endif()
-
-    macro(qt_wrap_cpp)
-        qt5_wrap_cpp(${ARGN})
-    endmacro()
 
 endif()
 

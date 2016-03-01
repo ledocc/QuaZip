@@ -13,15 +13,13 @@ include_directories(
 file(GLOB QUAZIP_SRCS "*.c" "*.cpp")
 file(GLOB QUAZIP_PUBLIC_HEADERS "*.h")
 
-qt_wrap_cpp(QUAZIP_MOC_SRCS ${QUAZIP_PUBLIC_HEADERS})
-set(SRCS ${QUAZIP_SRCS} ${QUAZIP_MOC_SRCS})
-
-
 
 ###########################################################
 # build commands
 ###########################################################
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 add_library(${target} ${QUAZIP_SRCS})
 
 set_target_properties(
