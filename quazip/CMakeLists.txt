@@ -22,17 +22,28 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 add_library(${target} ${QUAZIP_SRCS})
 
+
 set_target_properties(
     ${target}
     PROPERTIES
         POSITION_INDEPENDENT_CODE 1 # force to use fPIC even in static mode
 )
 
-target_link_libraries(
-    ${target}
-    Qt5::Core
-    ${ZLIB_LIBRARIES}
+target_include_directories(
+    ${target} SYSTEM
+    PUBLIC
+        ${ZLIB_INCLUDE_DIRS}
 )
+
+if(QuaZip_BUILD_WITH_QT4)
+    target_link_libraries(${target} Qt4::QtCore)
+else()
+    target_link_libraries(${target} Qt5::Core)
+endif()
+
+
+target_link_libraries(${target} ${ZLIB_LIBRARIES})
+
 
 set_target_properties(${taret} PROPERTIES
   FRAMEWORK TRUE

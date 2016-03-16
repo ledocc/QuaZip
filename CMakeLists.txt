@@ -7,7 +7,6 @@ project (QuaZip VERSION 0.7.1)
 ########################################################################################################################
 ## define usefull directory
 ########################################################################################################################
-
 set(ConfigPackageLocation lib/cmake/QuaZip)
 
 
@@ -19,53 +18,18 @@ option(QuaZip_BUILD_WITH_QT4 "enable to build QuaZip with Qt4, disable to build 
 option(BUILD_SHARED_LIBS "enable to build shared libraries, disable to build static libraries" OFF)
 
 
+
 ########################################################################################################################
 ## dependencies search
 ########################################################################################################################
+include(cmake/find_qt.cmake)
+include(cmake/find_zlib.cmake)
 
-if(QuaZip_BUILD_WITH_QT4)
-
-    set(qt_min_version "4.5.0")
-    find_package(Qt4 REQUIRED)
-
-    set(QT_USE_QTGUI false)
-    include(${QT_USE_FILE})
-    include_directories(${QT_INCLUDES})
-    set(QTCORE_LIBRARIES ${QT_QTCORE_LIBRARY})
-
-else()
-    find_package(
-        Qt5 REQUIRED
-        COMPONENTS
-            Core
-    )
+if( NOT QuaZip_BUILD_WITH_QT4)
 
     set(QuaZip_LIB_VERSION_SUFFIX 5)
 
-    # if there is no QT_ROOT, try to deduce it from Qt QtCore include
-    if ("${QT_ROOT}" STREQUAL "")
-        set(QT_ROOT ${QT_QTCORE_INCLUDE_DIR}/../..)
-    endif()
-
 endif()
-
-# Use system zlib on unix and Qt ZLIB on Windows
-if(WIN32)
-    # is Qt build with embeded zlib
-    find_path(
-        ZLIB_INCLUDE_DIR zlib.h
-        HINTS ${Qt5Core_INCLUDE_DIRS}
-        PATH_SUFFIXES QtZlib
-        NO_DEFAULT_PATH
-    )
-endif()
-
-if((UNIX OR MINGW) OR (NOT ZLIB_INCLUDE_DIR))
-    find_package(ZLIB REQUIRED)
-    set(QuaZip_SEARCH_ZLIB ON)
-endif()
-
-
 
 
 
@@ -86,7 +50,6 @@ else()
     set(INSTALL_ARCHIVE_DIR lib${LIB_POSTFIX})
 endif()
 
-
 add_subdirectory(quazip)
 
 
@@ -103,8 +66,23 @@ configure_file(
 )
 
 configure_file(
-    "cmake/QuaZipDependencies.cmake.in"
-    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/QuaZipDependencies.cmake"
+    "cmake/build_options.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/build_options.cmake"
+)
+configure_file(
+    "cmake/dependencies.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/dependencies.cmake"
+    COPYONLY
+)
+configure_file(
+    "cmake/find_qt.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/find_qt.cmake"
+    COPYONLY
+)
+configure_file(
+    "cmake/find_zlib.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/find_zlib.cmake"
+    COPYONLY
 )
 
 
@@ -117,9 +95,12 @@ write_basic_package_version_file(
 
 install(
   FILES
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/build_options.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/dependencies.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/find_qt.cmake"
+    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/find_zlib.cmake"
     "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/QuaZipConfig.cmake"
     "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/QuaZipConfigVersion.cmake"
-    "${CMAKE_BINARY_DIR}/${ConfigPackageLocation}/QuaZipDependencies.cmake"
   DESTINATION
     ${ConfigPackageLocation}
   COMPONENT
