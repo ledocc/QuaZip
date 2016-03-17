@@ -29,6 +29,21 @@ set_target_properties(
         POSITION_INDEPENDENT_CODE 1 # force to use fPIC even in static mode
 )
 
+# Must be added to enable export macro
+target_compile_definitions(
+    ${target}
+    PRIVATE
+        QUAZIP_BUILD
+    )
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(
+        ${target}
+        PUBLIC
+            QUAZIP_STATIC
+    )
+endif()
+
 target_include_directories(
     ${target} SYSTEM
     PUBLIC
