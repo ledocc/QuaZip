@@ -44,11 +44,6 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
-target_include_directories(
-    ${target} SYSTEM
-    PUBLIC
-        ${ZLIB_INCLUDE_DIRS}
-)
 
 if(QuaZip_BUILD_WITH_QT4)
     target_link_libraries(${target} Qt4::QtCore)
@@ -57,7 +52,7 @@ else()
 endif()
 
 
-target_link_libraries(${target} ${ZLIB_LIBRARIES})
+target_link_libraries(${target} ZLIB::ZLIB)
 
 
 set_target_properties(${taret} PROPERTIES
@@ -104,4 +99,3 @@ install(
     DESTINATION
         ${ConfigPackageLocation}
 )
-
