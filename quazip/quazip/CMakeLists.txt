@@ -1,31 +1,101 @@
-# set all include directories for in and out of source builds
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_BINARY_DIR}
-	${ZLIB_INCLUDE_DIRS}
-)
 
-file(GLOB SRCS "*.c" "*.cpp")
-file(GLOB PUBLIC_HEADERS "*.h")
+set(target quazip${QuaZip_LIB_VERSION_SUFFIX})
 
 # Must be added to enable export macro
-ADD_DEFINITIONS(-DQUAZIP_BUILD)
+add_definitions(-DQUAZIP_BUILD)
 
-qt_wrap_cpp(MOC_SRCS ${PUBLIC_HEADERS})
-set(SRCS ${SRCS} ${MOC_SRCS})
+# set all include directories for in and out of source builds
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${ZLIB_INCLUDE_DIR}
+)
 
-add_library(${QUAZIP_LIB_TARGET_NAME} SHARED ${SRCS})
-add_library(quazip_static STATIC ${SRCS})
- 
-# Windows uses .lib extension for both static and shared library
-# *nix systems use different extensions for SHARED and STATIC library and by convention both libraries have the same name
-if (NOT WIN32)
-	set_target_properties(quazip_static PROPERTIES OUTPUT_NAME quazip)
-endif ()
+file(GLOB QUAZIP_SRCS "*.c" "*.cpp")
+file(GLOB QUAZIP_PUBLIC_HEADERS "*.h")
 
-set_target_properties(${QUAZIP_LIB_TARGET_NAME} quazip_static PROPERTIES VERSION 1.0.0 SOVERSION 1 DEBUG_POSTFIX d)
-# Link against ZLIB_LIBRARIES if needed (on Windows this variable is empty)
-target_link_libraries(${QUAZIP_LIB_TARGET_NAME} quazip_static ${QT_QTMAIN_LIBRARY} ${QTCORE_LIBRARIES} ${ZLIB_LIBRARIES})
 
-install(FILES ${PUBLIC_HEADERS} DESTINATION include/quazip${QUAZIP_LIB_VERSION_SUFFIX})
-install(TARGETS ${QUAZIP_LIB_TARGET_NAME} quazip_static LIBRARY DESTINATION ${LIB_DESTINATION} ARCHIVE DESTINATION ${LIB_DESTINATION} RUNTIME DESTINATION ${LIB_DESTINATION})
+###########################################################
+# build commands
+###########################################################
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+add_library(${target} ${QUAZIP_SRCS})
+
+
+set_target_properties(
+    ${target}
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE 1 # force to use fPIC even in static mode
+)
+
+# Must be added to enable export macro
+target_compile_definitions(
+    ${target}
+    PRIVATE
+        QUAZIP_BUILD
+    )
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(
+        ${target}
+        PUBLIC
+            QUAZIP_STATIC
+    )
+endif()
+
+
+if(QuaZip_BUILD_WITH_QT4)
+    target_link_libraries(${target} Qt4::QtCore)
+else()
+    target_link_libraries(${target} Qt5::Core)
+endif()
+
+
+target_link_libraries(${target} ZLIB::ZLIB)
+
+
+set_target_properties(${taret} PROPERTIES
+  FRAMEWORK TRUE
+  FRAMEWORK_VERSION CXX
+  MACOSX_FRAMEWORK_IDENTIFIER org.quazip.QuaZip
+  MACOSX_FRAMEWORK_INFO_PLIST Info.plist
+  PUBLIC_HEADER dynamicFramework.h
+  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+)
+
+
+###########################################################
+# install commands
+###########################################################
+
+install(
+    FILES ${QUAZIP_PUBLIC_HEADERS}
+    DESTINATION
+        include/quazip
+    COMPONENT
+        Devel
+)
+
+install(
+    TARGETS ${target}
+    EXPORT ${target}Targets
+    RUNTIME  DESTINATION ${INSTALL_BINARY_DIR}
+    ARCHIVE  DESTINATION ${INSTALL_ARCHIVE_DIR}
+    LIBRARY  DESTINATION ${INSTALL_LIBRARY_DIR}
+    INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
+)
+
+export(
+    EXPORT
+        ${target}Targets
+    FILE
+        "${CMAKE_CURRENT_BINARY_DIR}/${target}Targets.cmake" # TODO test remove this
+)
+
+install(
+    EXPORT
+        ${target}Targets
+    DESTINATION
+        ${ConfigPackageLocation}
+)
