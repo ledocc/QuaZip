@@ -462,7 +462,10 @@ QStringList JlCompress::extractDir(QString fileCompressed, QString dir) {
     }
     do {
         QString name = zip.getCurrentFileName();
-        QString absFilePath = directory.absoluteFilePath(name);
+        if( ! name.startsWith("/")){
+            name = "/" + name;
+        }
+        QString absFilePath = directory.absolutePath() + name;
         if (!extractFile(&zip, "", absFilePath)) {
             removeFile(extracted);
             return QStringList();
