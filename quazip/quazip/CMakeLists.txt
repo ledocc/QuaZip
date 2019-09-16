@@ -89,13 +89,17 @@ install(
 export(
     EXPORT
         ${target}Targets
+    NAMESPACE
+        QuaZip::
     FILE
-        "${CMAKE_CURRENT_BINARY_DIR}/${target}Targets.cmake" # TODO test remove this
+        "${CMAKE_CURRENT_BINARY_DIR}/${target}Targets.cmake"
 )
 
 install(
     EXPORT
         ${target}Targets
+    NAMESPACE
+        QuaZip::
     DESTINATION
         ${ConfigPackageLocation}
 )
